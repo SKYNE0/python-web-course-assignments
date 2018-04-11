@@ -1,0 +1,88 @@
+body{
+    background-color: #f5f5f5;
+}
+
+.ui.inverted.basic.segment{
+    position: static;
+    height: 56px;
+    padding: 2px;
+    background: #ff3a36;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.ui.inverted.text.menu{
+    padding:0 0 0 18px;
+}
+
+.ui.inverted.circular.segment{
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    left: 83%;
+    padding: 0px;
+    margin: 0px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    overflow:hidden;
+}
+
+.ui.p{
+    position: absolute;
+    left: 85%;
+    margin: 8px;
+}
+
+.right.menu{
+    margin-left: -30px;
+    width: 86px;
+    height: 36px;
+}
+
+
+.ui.three.item.menu{
+    width: 402px;
+    height: 46px;
+    margin: 46px;
+    background: #ebebeb;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 0px;
+}
+
+.ui.inverted.new{
+    width: 824px;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    top: 550px;
+
+}
+
+.ui.fluid.card{
+    width: 256px;
+    height: 230px;
+}
+
+.image{
+    width: 256px;
+    height: 140px;
+    overflow: hidden;
+}
+.content{
+    line-height: 0;
+    height: 53px;
+    padding:  3em 1em 3em 1em;
+}
+
+.ui.two.item.menu{
+    width: 150px;
+    height: 40px;
+    margin: 74px;
+    background: #ffffff;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 0px;
+}

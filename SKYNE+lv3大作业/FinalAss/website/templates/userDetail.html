@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}" />
+        <script src="{% static 'js/vue1.js' %}"></script>
+        <script src="{% static 'js/reqwest.js' %}"></script>
+        <script src="{% static 'js/js.cookie.js' %}"></script>
+
+        <style media="screen">
+            body {
+                padding-top: 40px;
+            }
+            .ui.profile.container {
+                padding-top: 60px;
+            }
+
+        </style>
+    </head>
+    <body id="app">
+
+        <div  class="ui fixed inverted red borderless menu">
+            <div class="header item">
+                <a href="/m/userlistpanel/"><i class="large icon angle left"></i></a>
+                10MINs
+            </div>
+
+        </div>
+
+        <!-- v-if="!opps" -->
+        <div class="ui profile container">
+            <h2 class="ui header">
+              {% if userpic %}
+                <img src="/upload/{{userpic}}" class="ui circular image">
+              {% else %}
+                <img src="{% static 'images/matt.jpg' %} " class="ui circular image">
+              {% endif %}
+                {% verbatim %}
+                {{ user_info.current_username }}
+                {% endverbatim %}
+            </h2>
+            <input type="hidden" v-model="user_info.userid" value="{{id}}">
+            {% verbatim %}
+            <form class="ui form">
+                <div class="field">
+                    <label>Username</label>
+                    <input type="text" v-model="user_info.username" >
+
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input type="text" v-model="user_info.password"  >
+                </div>
+
+
+            </form>
+            <button style="margin-top:1em;" class="ui button" v-on:click="updateUser">Save</button>
+            <h4 class="ui header">修改状态：{{msg}}</h4>
+        </div>
+
+
+        <script>
+        vm = new Vue({
+            el:"#app",
+            data:{
+                {% endverbatim %}
+                id:{{id}},
+                {% verbatim %}
+                user_info:{
+                  userid:'',
+                  username:'',
+                  password:'',
+                  current_username:"",
+                },
+                msg:''
+
+            },
+            methods:{
+              updateUser:function () {
+                  // alert("updateing");
+                  var self = this;
+                  reqwest({
+                      url:'/api/userdetail/',
+                      type:'json',
+                      method:'post',
+                      data:{
+                          userid:self.user_info.userid,
+                          username:self.user_info.username,
+                          password:self.user_info.password,
+                      },
+                      // headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                      success:function (resp) {
+
+                          console.log(resp);
+                          // alert(resp);
+                          self.user_info.username=resp.username;
+                          self.user_info.current_username=resp.username;
+                          self.user_info.password=resp.password;
+                          self.msg='修改成功！'
+                      },
+                      error:function (resp) {
+
+                          console.log(resp);
+                          self.msg='修改失败！'
+
+                      },
+
+                  })
+              },
+              getUsername:function () {
+                  // alert("updateing");
+                  var self = this;
+                  reqwest({
+                      url:'/api/getusername/',
+                      type:'json',
+                      method:'post',
+                      data:{
+                          userid:self.id,
+                      },
+
+                      headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                      success:function (resp) {
+                          console.log(resp);
+                          self.user_info = resp;
+                      },
+
+                  })
+              },
+            },
+            ready:function(){
+                // alert(Cookies.get('id'));
+              self = this;
+              if(!Cookies.get('token') || !Cookies.get('isAdmin')){
+              alert("ceshi")
+              location.href="/m/userlistpanel/login";
+              }
+              else{
+                self.getUsername()
+              }
+            },
+        })
+        </script>
+    </body>
+    {% endverbatim %}
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+
+
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}" />
+        <script src="{% static 'js/vue1.js' %}"></script>
+        <script src="{% static 'js/reqwest.js' %}"></script>
+        <script src="{% static 'js/js.cookie.js' %}"></script>
+
+        <style media="screen">
+            body {
+                padding-top: 40px;
+            }
+            .ui.very.padded.userlist.container {
+                padding-top: 50px;
+            }
+            .ui.fixed.something.menu {
+                position: fixed;top:50px;
+            }
+            .unscrollable{
+                height:100%;
+                overflow:hidden;
+            }
+            .ui.padded.modal.active {
+                transform: translate(0, -50%);
+            }
+            .ui.vertical.inverted.background.segment {
+                height: 260px;
+                background-size: cover;
+            }
+
+            .shortcut.buttons{
+                position: absolute;top:15px;left:15px;
+            }
+
+
+
+        </style>
+
+    </head>
+
+    {% verbatim %}
+    <body id="app" class="dimmable {{ canScroll }} ">
+
+        <div  class="ui fixed inverted red borderless menu">
+            <a href="/">
+                <div v-on:click="showMenu = !showMenu" class="header item">
+                    10MINs
+                </div>
+            </a>
+
+            <div class="right menu">
+                <div class="item">
+                    <button v-on:click="logOut" class="ui tiny inverted circular button" type="button" name=""> {{ username }} </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-show="modal.show" class="ui dimmer animated {{ fadeInOut }} active" style="display:none;"  >
+            <!-- 上面标签的 style="display:none;" 是在页面加载时解决闪框的办法 -->
+            <div class="ui padded  modal {{ loadingOrNot }} segment active">
+                <h3 class="ui header">{{ showMsg }}</h3>
+                <i v-on:click="modalSwitch" class="icon tiny close" ></i>
+
+                <div class="content">
+                    <form class="ui form " >
+                        <div class="field">
+                            <input v-model="newuser.username" type="text" placeholder="用户名">
+                        </div>
+                        <div class="field">
+                            <input  v-model="newuser.password" type="password" placeholder="密码">
+                        </div>
+                        <div class="field">
+                            <input v-model="newuser.email" type="text" placeholder="邮箱">
+                        </div>
+                        <div class="ui secondary  menu" >
+
+                          <a v-bind:class="subMenu1.classcontent" v-on:click="menuSwitch">
+                            normal
+                          </a>
+                          <a v-bind:class="subMenu2.classcontent" v-on:click="menuSwitch">
+                            author
+                          </a>
+                        </div>
+
+
+                    </form>
+
+                </div>
+                <div v-on:click="createUser" class="ui fluid positive  button" >Submit</div>
+            </div>
+
+        </div>
+
+        <!-- v-if="!opps" -->
+
+
+        <div class="ui very padded userlist container">
+            <div class="ui big header">Operation</div>
+            <button v-on:click="modal.show = !modal.show" class="ui  tiny circular button" type="button" ><i class="icon plus"></i>NEW USER</button>
+            <div class="ui divider"></div>
+            <div class="ui big header">{{uids.length}} user in the list</div>
+            <div  class="ui very selection relaxed list">
+
+                <div v-for="uid in uids" class="item">
+
+                    <img v-if="uid.profile.profile_image"  class="ui avatar image" :src="uid.profile.profile_image">
+
+                    <img v-else class="ui avatar image"
+                    {% endverbatim %}
+                    src="{% static 'images/matt.jpg' %}"
+                    {% verbatim %}
+                    >
+
+
+                    <div class="content">
+
+                        <a class="header" href="/m/userdetail/{{uid.id}}">{{uid.username}}</a>
+
+                        <span v-if="uid.profile.role=='author'"  class="ui tiny orange label">Invited Author</span>
+                        <span v-if="uid.profile.role=='normal'"  class="ui tiny grey label">Normal</span>
+                        <span v-else></span>
+                        <span v-show="!uid.is_active" class="ui tiny red label" >banned</span>
+                        <span v-show="uid.menuShow" class="description">
+                            <div class="ui divider"></div>
+                            <div class="ui label" v-on:click="delUser(uid)">
+                                DELETE
+                            </div>
+
+                            <div class="ui label" v-on:click="invitedUser(uid)">
+                                Invited Author
+                            </div>
+
+                            <div class="ui label" v-on:click="banUser(uid)">
+                                Ban this user
+                            </div>
+                        </span>
+                    </div>
+                    <div class="right floated content">
+                        <i v-on:click="uid.menuShow=!uid.menuShow" class="icon ellipsis vertical"></i>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <script>
+            vm = new Vue({
+                el:"#app",
+                data:{
+                    modal:{
+                        show:false,
+                        msg:''
+                    },
+                    extraMenu:{
+                        show:false
+                    },
+                    uids:[],
+                    newuser:{
+                      username:'',
+                      password:'',
+                      email:'',
+                      role:'',
+
+                    },
+                    subMenu1:{
+                      active:false,
+                      classcontent:'item',
+                    },
+                    subMenu2:{
+                      active:true,
+                      classcontent:'active item',
+                    }
+
+                },
+                methods:{
+                    modalSwitch:function () {
+                        this.modal.show = !this.modal.show
+                    },
+                    getUserList:function () {
+                        var self = this;
+                        reqwest({
+                            url:'/api/userlist/',
+                            type:'json',
+                            method:'get',
+                            headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                            success:function (resp) {
+                                console.log(resp);
+                                self.uids = resp
+
+                            },
+
+                        })
+                    },
+                    createUser:function () {
+                        // alert("sending");
+                        var self = this;
+                        reqwest({
+                            url:'/api/userlist/',
+                            type:'json',
+                            method:'post',
+                            data:{
+                                username:this.newuser.username,
+                                password:this.newuser.password,
+                                email:this.newuser.email,
+                                role:this.newuser.role,
+                            },
+                            // headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                            success:function (resp) {
+                                console.log(resp);
+                                self.modal.show = !self.modal.show;
+                                self.newuser.username='';
+                                self.newuser.password='';
+                                self.newuser.email='';
+                                self.newuser.role='';
+                                self.modal.msg='201'
+                                self.getUserList();
+                            },
+                            error:function (err) {
+                                console.log(err);
+                                self.newuser.username='';
+                                self.newuser.password='';
+                                self.newuser.email='';
+                                self.newuser.role='';
+                                self.modal.msg='400'
+                                self.getUserList();
+                            },
+
+                        })
+                    },
+                    delUser:function (uid) {
+                        // alert("sending");
+                        var self = this;
+                        var id = uid.id
+                        reqwest({
+                            url:'/api/changeuser/' + id,
+                            type:'json',
+                            method:'delete',
+                            // headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                            success:function (resp) {
+                                console.log(Cookies.get('token'));
+                                console.log(resp);
+                                self.getUserList()
+                            },
+
+                        })
+                    },
+
+                    invitedUser:function (uid) {
+                        // alert("sending");
+                        var self = this;
+                        var id = uid.id
+                        reqwest({
+                            url:'/api/changeuser/' + id,
+                            type:'json',
+                            method:'put',
+                            data:{
+                                role:'author',
+                            },
+                            // headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                            success:function (resp) {
+                                // console.log(Cookies.get('token'));
+                                console.log(resp);
+                                self.getUserList()
+                            },
+
+                        })
+                    },
+
+                    banUser:function (uid) {
+                        // alert("sending");
+                        var self = this;
+                        var id = uid.id
+                        reqwest({
+                            url:'/api/banuser/' + id,
+                            type:'json',
+                            method:'get',
+                            headers:Cookies.get('token')? {'Authorization': 'Token ' + Cookies.get('token')}:{},
+                            success:function (resp) {
+                                // console.log(Cookies.get('token'));
+                                console.log(resp);
+                                self.getUserList()
+                            },
+
+                        })
+                    },
+
+                    menuSwitch:function () {
+                      this.subMenu1.active = !this.subMenu1.active;
+                      this.subMenu2.active = !this.subMenu2.active;
+                      if (!this.subMenu1.active&this.subMenu2.active){
+                        this.subMenu1.classcontent='item';
+                        this.subMenu2.classcontent='active item'
+                        this.newuser.role='author'
+                      }
+                      else{
+                        this.subMenu1.classcontent='active item';
+                        this.subMenu2.classcontent='item'
+                        this.newuser.role='normal'
+                      }
+                    },
+                    logOut:function () {
+                        Cookies.remove('username');
+                        Cookies.remove('token');
+                        Cookies.remove('isAdmin');
+                        location.href="/m/userlistpanel/login/";
+                    },
+
+
+                },
+                computed:{
+
+                    canScroll:function () {
+                        if (this.modal.show) {
+                            return 'unscrollable'
+                        } else {
+                            return ''
+                        }
+                    },
+                    fadeInOut:function () {
+                        if (this.modal.show) {
+                            return ' fadeIn'
+                        } else {
+                            return ' fadeOut'
+                        }
+                    },
+                    showMsg:function () {
+                        if (this.modal.msg == '201') {
+                            return 'SUCCESS'
+                        } else if (this.modal.msg == '400') {
+                            return 'SOMETHING WRONG'
+                        } else {
+                            return 'Create a user'
+                        }
+                    },
+                    username:function () {
+                        return Cookies.get('username')
+                    },
+
+                },
+                ready:function () {
+                    self = this;
+                    if(Cookies.get('token') && Cookies.get('isAdmin')){
+                      this.getUserList();
+                    }
+                    else{
+                      alert("您尚未登录，请先登录")
+                      location.href="/m/userlistpanel/login/";
+                    }
+
+                },
+
+
+            })
+        </script>
+    </body>
+    {% endverbatim %}
+</html>

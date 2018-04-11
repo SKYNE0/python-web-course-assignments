@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.6/semantic.css" />
+        <style media="screen">
+            body {
+                padding-top: 40px;
+            }
+            .ui.vertical.segment.masthead {
+                height:300px;
+                padding-top:80px;
+                background-image: url(../static/images/super_blur_back2.jpg);
+                background-size: cover;
+            }
+            .ui.login.container {
+                padding-top: 60px;
+            }
+            .ui.fixed.something.menu {
+                position: fixed;top:100px;
+            }
+            .unscrollable{
+                height:100%;
+                overflow:hidden;
+            }
+            .ui.padded.modal.active {
+                transform: translate(0, -50%);
+            }
+            .ui.vertical.inverted.background.segment {
+                height: 260px;
+                background-size: cover;
+            }
+
+            .shortcut.buttons{
+                position: absolute;top:15px;left:15px;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <div  class="ui fixed inverted red borderless menu">
+            <div class="header item">
+                10MINs
+            </div>
+        </div>
+        <!-- v-if="!opps" -->
+        <div class="ui vertical center aligned inverted segment masthead">
+            <h1 class="ui  heasder" style="font-size: 40px;">Welcome</h1>
+            <h2 style="font-size: 35px;">You Can Choose The Following</h2>
+        </div>
+        <div class="ui basic fixed segment" style="position: fixed; margin-top: 100px; width:100%; height:auto;text-align:center; font-size:30px;">
+            <div class="ui massive compact menu">
+              <a href="/m/userlistpanel/" class="item"><i class="ui large users icon"></i> 用户列表 </a>
+              <a href="/m/userlistpanel/login/" class="item"><i class="ui large spy icon"></i> 后台管理 </a>
+              <a href="/list/" class="item"><i class="ui large marker icon"></i> 其他页面 </a>
+            </div>
+        </div>
+    </body>
+</html>

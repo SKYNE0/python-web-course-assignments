@@ -1,0 +1,22 @@
+.ui.inverted.top.fixed.menu.borderless.red.menu {
+    background-color: #ff5144;
+}
+.ui.vertical.inverted.detail.segment {
+    height: 500px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url();
+}
+
+.ui.basic.segment.container {
+    margin-top: 30px;
+    width: 700px;
+}
+.ui.basic.segment.container > p {
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+.ui.center.paginator.aligned.container {
+    margin-top: 50px;
+}

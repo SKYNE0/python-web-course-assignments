@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" media="screen" title="no title" charset="utf-8">
+        <link rel="stylesheet" href="{% static 'css/myinfo.css' %}" media="screen" title="no title">
+        <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway" rel="stylesheet">
+
+    </head>
+    <body>
+        <div class="ui inverted top fixed menu borderless red menu">
+            <div class="header item">
+                <div class="ui image">
+                    <a href="/index/">
+                    <img src="{% static 'images/tenlogo.png' %}" alt="">
+                    </a>
+                </div>
+            </div>
+
+            <div class="right menu">
+                <div class="item">
+                    {% if request.user.is_authenticated %}
+                    <h5 class="ui inverted header">
+                            <div class="ui mini circular image">
+                            {% if request.user.belong_to.avatar %}
+                                <img src="/media/{{ request.user.belong_to.avatar }}" alt="">
+                            {% else %}
+                                <img src="{% static 'image/default.jpg' %}" alt="">
+                             {% endif %}
+                            </div>
+                        <span>{{ request.user.username }}</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="item">
+
+                    <a href="{% url 'logout' %}" class="ui inverted circular button">Logout</a>
+
+                </div>
+            </div>
+        </div>
+        <div class="ui  raised container segments">
+            <div class="ui head basic segment" style="background-image: url({% static 'images/bg.png' %});">
+                <div class="ui circular image cover">
+                    {% if request.user.belong_to.avatar %}
+                        <img src="/media/{{ request.user.belong_to.avatar }}" alt="">
+                    {% else %}
+                        <img src="{% static 'image/default.jpg' %}" alt="">
+                     {% endif %}
+                </div>
+
+
+
+            </div>
+            <div class="ui bottom inverted  six item attached menu">
+
+                <div class="active item">
+                    个人资料
+                </div>
+                <a href="/mycollection/" class="item">
+                    我赞过的
+                </a>
+            </div>
+
+            <div class="ui butt segment">
+                <div class="ui basic very padded segment container info">
+                    <form class="ui form"  action="/myinfo/" enctype="multipart/form-data" accept-charset="utf-8" method="post">
+                        {% csrf_token %}
+                        <div class="field">
+                            <label>姓名</label>
+                            <input type="text" name="name" placeholder="你的真实姓名">
+                        </div>
+                        <div class="field">
+                            <select name="sex">
+                                <option value="sex">性别</option>
+                                <option value="male">男</option>
+                                <option value="female">女</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>密码</label>
+                            <input type="text" name="key" placeholder="抱歉，暂不支持密码修改">
+                        </div>
+                        <div class="field" >
+                            <label>修改头像</label>
+                            <input type="file"  name="img" value="">
+                        </div>
+
+                        <button class="ui inverted red right floated button" type="submit">修改资料</button>
+                    </form>
+                </div>
+                {% if messages %}
+                   <ul class=" ui red header messages" style="background-color: ghostwhite; text-align:center;">
+                       {% for message in messages %}
+                       <P {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</P>
+                       {% endfor %}
+                   </ul>
+                {% endif %}
+            </div>
+        </div>
+    </body>
+</html>

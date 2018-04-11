@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <link rel="stylesheet" href="{% static 'css/semantic.css' %}" />
+        <link rel="stylesheet" href="{% static 'css/animate.css' %}" />
+        <script src="{% static 'js/vue1.js' %}"></script>
+        <script src="{% static 'js/reqwest.js' %}"></script>
+        <script src="{% static 'js/js.cookie.js' %}"></script>
+
+        <style media="screen">
+            body {
+                padding-top: 40px;
+            }
+            .ui.vertical.segment.masthead {
+                height:200px;
+                padding-top:80px;
+                background-image: url({% static 'images/super_blur_back2.jpg' %});
+                background-size: cover;
+            }
+            .ui.login.container {
+                padding-top: 60px;
+            }
+            .ui.fixed.something.menu {
+                position: fixed;top:50px;
+            }
+            .unscrollable{
+                height:100%;
+                overflow:hidden;
+            }
+            .ui.padded.modal.active {
+                transform: translate(0, -50%);
+            }
+            .ui.vertical.inverted.background.segment {
+                height: 260px;
+                background-size: cover;
+            }
+
+            .shortcut.buttons{
+                position: absolute;top:15px;left:15px;
+            }
+
+
+        </style>
+    </head>
+    {% verbatim %}
+    <body id="app" >
+        <div  class="ui fixed inverted red borderless menu">
+            <a href="/">
+                <div v-on:click="showMenu = !showMenu" class="header item">
+                    10MINs
+                </div>
+            </a>
+        </div>
+        <!-- v-if="!opps" -->
+        <div class="ui vertical center aligned inverted segment masthead">
+            <h1 class="ui  heasder">Welcome</h1>
+        </div>
+        <div class="ui login container">
+            <form class="ui form">
+                <div class="field">
+                    <label>Username</label>
+                    <input v-model="userinfo.username" type="text"  placeholder="Username">
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input v-model="userinfo.password" type="text"  placeholder="Password">
+                </div>
+
+                <button id="button" v-on:click="logIn" class="ui button" type="button" >Submit</button>
+                <h4 class="ui red header">{{modal.msg}}</h4>
+            </form>
+        </div>
+
+
+
+
+        <script>
+          vm = new Vue({
+            el:"#app",
+            data:{
+                modal:{
+                    username:'',
+                    password:'',
+                    msg:'',
+                },
+                userinfo:{
+                    username:'',
+                    password:'',
+                },
+            },
+            methods:{
+                logIn:function () {
+                    var self = this;
+                    reqwest({
+                        url:'/api/token-auth-admin',
+                        type:'json',
+                        method:'post',
+                        data:{
+                            username:this.userinfo.username,
+                            password:this.userinfo.password,
+                        },
+                        success:function (resp) {
+                            console.log(resp);
+                            if(resp.isAdmin){
+                              Cookies.set('username',resp.username);
+                              Cookies.set('token',resp.token);
+                              Cookies.set('isAdmin',resp.isAdmin);
+                              location.href="/m/userlistpanel/";
+                            }else{
+                              self.modal.msg="抱歉，您不是超级管理员";
+                            }
+
+                        },
+                        error:function (err) {
+                            console.log(err);
+                            self.modal.msg="请输入正确的用户名或密码";
+
+
+
+                        }
+
+                    })
+                },
+            }
+          })
+        </script>
+    </body>
+    {% endverbatim %}
+</html>
